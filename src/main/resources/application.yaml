@@ -14,3 +14,8 @@ spring:
   flyway:
     locations: classpath:db/migration, classpath:db/testdb
     baselineOnMigrate: true
+
+aws:
+  region: us-east-1
+  bucket:
+    name: events-tech-images
