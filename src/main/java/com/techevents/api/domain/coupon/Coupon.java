@@ -23,7 +23,7 @@ public class Coupon {
     private UUID id;
 
     private String code;
-    private String discount;
+    private Integer discount;
     private Date valid;
 
     @ManyToOne
