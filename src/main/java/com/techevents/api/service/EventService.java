@@ -3,18 +3,24 @@ package com.techevents.api.service;
 import com.amazonaws.services.s3.AmazonS3;
 import com.techevents.api.domain.event.Event;
 import com.techevents.api.domain.event.EventRequestDTO;
+import com.techevents.api.domain.event.EventResponseDTO;
 import com.techevents.api.repositories.EventRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -31,6 +37,7 @@ public class EventService {
     @Autowired
     private EventRepository eventRepository;
 
+    @Transactional
     public Event createEvent(EventRequestDTO eventRequestDTO) {
         String imgUrl = null;
 
@@ -70,5 +77,14 @@ public class EventService {
         fileOutputStream.write(multipartFile.getBytes());
         fileOutputStream.close();
         return file;
+    }
+
+    public List<EventResponseDTO> getEvents(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Event> eventsPage = this.eventRepository.findAll(pageable);
+        return eventsPage.map(event -> new EventResponseDTO(
+                        event.getId(), event.getTitle(), event.getDescription(), event.getDate(),
+                        "", "", event.getRemote(), event.getEventUrl(), event.getImgUrl()))
+                .toList();
     }
 }
